@@ -1,0 +1,243 @@
+service: Bridge-Settlement-Handler
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: us-east-1
+  timeout: 30
+  memorySize: 512
+  # apiGateway:
+  #   apiKeySourceType: HEADER # Source of API key for usage plan. HEADER or AUTHORIZER.
+  #   apiKeys: # List of API keys to be used by your service API Gateway REST API
+  #   - bridgeAPIKey
+  #   value: bridgeAPIKey
+  #   description: API key for bridge
+  #     # - ${opt:stage}-myFirstKey
+  #     # - ${env:MY_API_KEY} # you can hide it in a serverless variable
+  # usagePlan: # Optional usage plan configuration
+  #     quota:
+  #       limit: 5000
+  #       offset: 2
+  #       period: MONTH
+  #     throttle:
+  #       burstLimit: 200
+  #       rateLimit: 100
+  environment:
+    NODE_ENV: development
+    APP_NAME: Bridge-Settlement-Handler
+    LOG_LEVEL: debug
+    DEPOSIT_QUEUE: DEPOSIT_QUEUE
+    DEPOSIT_SQS_URL: { Ref: DepositQueue }
+    MINT_SQS_URL: { Ref: MintQueue }
+    BURN_SQS_URL: { Ref: BurnQueue }
+    REDEEM_SQS_URL: { Ref: RedeemQueue }
+    ERROR_SQS_URL: { Ref: ErrorQueue }
+    SECRET_MANAGER_API_VERSION: '2017-10-17'
+    API_DOMAIN: https://${self:provider.stage}.halo-bridge.io
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - sqs:DeleteMessage
+      - sqs:ReceiveMessage
+      - sqs:SendMessage
+    Resource: arn:aws:sqs:*:*:${self:custom.depositSQS}
+  - Effect: Allow
+    Action:
+      - sqs:DeleteMessage
+      - sqs:ReceiveMessage
+      - sqs:SendMessage
+    Resource: arn:aws:sqs:*:*:${self:custom.mintSQS}
+  - Effect: Allow
+    Action:
+      - sqs:DeleteMessage
+      - sqs:ReceiveMessage
+      - sqs:SendMessage
+    Resource: arn:aws:sqs:*:*:${self:custom.burnSQS}
+  - Effect: Allow
+    Action:
+      - sqs:DeleteMessage
+      - sqs:ReceiveMessage
+      - sqs:SendMessage
+    Resource: arn:aws:sqs:*:*:${self:custom.redeemSQS}
+  - Effect: Allow
+    Action:
+      - sqs:DeleteMessage
+      - sqs:ReceiveMessage
+      - sqs:SendMessage
+    Resource: arn:aws:sqs:*:*:${self:custom.errorSQS}
+  
+
+custom:
+  region: ${self:provider.region}
+  stage: ${opt:stage, self:provider.stage}
+  prefix: ${self:custom.stage}-${self:service}
+  config: ${self:custom.prefix}-config
+  depositSQS: ${self:provider.stage}DepositQueue
+  mintSQS: ${self:provider.stage}MintQueue
+  burnSQS: ${self:provider.stage}BurnQueue
+  redeemSQS: ${self:provider.stage}RedeemQueue
+  errorSQS: ${self:provider.stage}ErrorQueue
+  
+
+plugins:
+  - serverless-plugin-typescript 
+  - serverless-offline
+  - serverless-dotenv-plugin
+  - serverless-plugin-reducer
+  - serverless-middleware
+
+package:
+  exclude:
+    - .env.staging
+    - .env.production
+
+functions:
+  receiveDepositCallback:
+    handler: app/handler.receiveDepositCallback
+    events:
+      - http:
+          path: deposit/callback
+          method: POST
+          # private: true
+  receiveBurnCallback:
+    handler: app/handler.receiveBurnCallback
+    events:
+      - http:
+          path: burn/callback
+          method: POST
+  processDeposit:
+    handler: app/handler.processDeposit
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - DepositQueue
+              - Arn
+  processBurn:
+    handler: app/handler.processBurn
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - BurnQueue
+              - Arn
+  verifyMintTx:
+    handler: app/handler.verifyMintTx
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - MintQueue
+              - Arn
+  verifyReleaseTx:
+    handler: app/handler.verifyReleaseTx
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - RedeemQueue
+              - Arn
+  getListOfDeposits:
+    handler: app/handler.getListOfDeposits
+    events:
+      - http:
+          path: deposits
+          method: GET
+  getListOfBurns:
+    handler: app/handler.getListOfBurns
+    events:
+      - http:
+          path: burns
+          method: GET
+  getListOfMintRequests:
+    handler: app/handler.getListOfMintRequests
+    events:
+      - http:
+          path: mint-requests
+          method: GET
+  getListOfRedeemRequests:
+    handler: app/handler.getListOfRedeemRequests
+    events:
+      - http:
+          path: redeem-requests
+          method: GET
+
+  
+resources:
+  Resources:
+    DepositQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.depositSQS}
+        MessageRetentionPeriod: 1209600
+        VisibilityTimeout: 180
+        RedrivePolicy:
+          deadLetterTargetArn:
+            Fn::GetAtt:
+            - DepositDeadLetterQueue
+            - Arn
+          maxReceiveCount: 1000
+    DepositDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.depositSQS}-dead-letter-queue
+        MessageRetentionPeriod: 1209600
+    MintQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.mintSQS}
+        MessageRetentionPeriod: 1209600
+        VisibilityTimeout: 180
+        RedrivePolicy:
+          deadLetterTargetArn:
+            Fn::GetAtt:
+            - MintDeadLetterQueue
+            - Arn
+          maxReceiveCount: 1000
+    MintDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.mintSQS}-dead-letter-queue
+        MessageRetentionPeriod: 1209600
+    BurnQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.burnSQS}
+        MessageRetentionPeriod: 1209600
+        VisibilityTimeout: 180
+        RedrivePolicy:
+          deadLetterTargetArn:
+            Fn::GetAtt:
+            - BurnDeadLetterQueue
+            - Arn
+          maxReceiveCount: 1000
+    BurnDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.burnSQS}-dead-letter-queue
+        MessageRetentionPeriod: 1209600
+    RedeemQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.redeemSQS}
+        MessageRetentionPeriod: 1209600
+        VisibilityTimeout: 180
+        RedrivePolicy:
+          deadLetterTargetArn:
+            Fn::GetAtt:
+            - RedeemDeadLetterQueue
+            - Arn
+          maxReceiveCount: 1000
+    RedeemDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.redeemSQS}-dead-letter-queue
+        MessageRetentionPeriod: 1209600
+    ErrorQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.errorSQS}
+        MessageRetentionPeriod: 1209600
+        VisibilityTimeout: 180

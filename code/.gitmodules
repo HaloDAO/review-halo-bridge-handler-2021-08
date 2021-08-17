@@ -1,0 +1,3 @@
+[submodule "token-bridge"]
+	path = token-bridge
+	url = git@github.com:HaloDAO/token-bridge.git
