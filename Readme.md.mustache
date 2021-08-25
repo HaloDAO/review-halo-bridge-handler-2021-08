@@ -12,7 +12,7 @@
 - **Commit hash** `{{commit_hash}}`
 - **Technologies**
   - Solidity
-  - Node.JS
+  - TypeScript
 
 ## Issues Summary
 
@@ -26,21 +26,40 @@
 
 This report represents the results of the engagement with **{{client_name}}** to review **{{project_name}}**.
 
-The review was conducted over the course of **{{review_period}}** from **{{date_interval}}**. A total of **{{person_days}} person-days** were spent reviewing the code.
+The review is part of a wider one, which includes several other components from the HaloDAO ecosystem: (Halo Rewards, Halo AMM, Halo Bridge, Halo Bridge Handler). It was conducted over the course of **{{review_period}}** from **{{date_interval}}**. A total of **{{person_days}} person-days** were spent reviewing the code.
 
-### Week 1
+### Review progress and strategy
 
-During the first week, we ...
+The HaloDAO Bridge sits between Ethereum mainnet and any other EVM compatible chain - Polygon being the first Layer 2 chain targeted for implementation.
 
-### Week 2
+We started by going through the Solidity smart contracts inside the HaloDAO Token Bridge repository as well as reading the TypeScript code within the HaloDAO Bridge Handler repository. In order to process transfers from Chain A to Chain B (eg. Ethereum mainnet to Polygon), the Bridge Handler uses a service ([HAL](https://www.hal.xyz/)) that helps pass Events from a chain to a webhook endpoint. Specifically, when a `DepositReceived` Event is emitted from the `PrimaryBridge` smart contract, the HAL service will call the HaloDAO Bridge Handler endpoint. From here the Bridge Handler script calls `mint` function on the `SecondaryBridge` smart contract in order to create the respective tokens on the destination chain.
 
-The second week was ...
+Because of the nature of decentralized blockchains, it is critical that the code that interactions with any of the chains involved in the transfer process are aware of [_chain reorganisation_ (or _reorg_)](https://learnmeabitcoin.com/technical/chain-reorganisation).
+
+While discussing with the team it became clear early on that the HAL service waits for 3 block confirmations before it considers a block as finalized. This is nowhere near the desired safety level for a cross-chain Bridge: for example, centralised exchanges use a minimum of 10 confirmations for any Ethereum / ERC20 transfer (we detailed this in issue #1).
+
+The next question we asked ourselves was what should be a safe amount of block confirmations to consider a block as finalized for each of the chains involved. The Polygon chain has much faster block times and therefore requires a higher number of confirmations. We detailed our findings about this in issue #1.
+
+We continued to review the code, while creating an overview of the architecture to help us have a better understanding of its trust model.
+
+## Trust model
+
+We identified a few important parts of the system that hold increased trust and are critical to the system's correctness and well behavior.
+
+### Reliance on an external party for safety of transactions and funds
+
+The HAL service has full control over funds on all chains supported by the HaloDAO Bridge. For example, if HAL is compromised, an attacker __is able to drain funds__ out of the Ethereum mainnet `PrimaryBridge` contract. 
+
+### Centralised control of smart contracts and transfer handling scripts
+
+Currently both the blockchain smart contracts and the HaloDAO Bridge Handler scripts are controlled by the HaloDAO team. If the (multisig) account that controls the smart contracts is compromised, user funds are at risk.
+
+The Bridge Handler will have to run on a server (AWS infrastructure), therefore the cloud account(s) that have access to these scripts are vulnerable to an attack as well.
+
 
 ## Scope
 
-The initial review focused on the [{{project_name}}]({{source_repository}}) repository, identified by the commit hash `{{commit_hash}}`. ...
-
-<!-- We focused on manually reviewing the codebase, searching for security issues such as, but not limited to, re-entrancy problems, transaction ordering, block timestamp dependency, exception handling, call stack depth limitation, integer overflow/underflow, self-destructible contracts, unsecured balance, use of origin, costly gas patterns, architectural problems, code readability. -->
+The initial review focused on the [{{project_name}}]({{source_repository}}) repository, identified by the commit hash `{{commit_hash}}`.
 
 **Includes:**
 - GoodContract.sol
