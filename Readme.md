@@ -32,14 +32,14 @@
                </span>
                <br />
                <span class="details-value">
-                    Daniel Luca
-               </span><br />
-               <span class="contact">@cleanunicorn</span>
-               <br />
-               <span class="details-value">
                     Andrei Simion
                </span><br />
                <span class="contact">@andreiashu</span>
+               <br />
+               <span class="details-value">
+                    Daniel Luca
+               </span><br />
+               <span class="contact">@cleanunicorn</span>
           </div>
     </div>
 </div>
@@ -54,14 +54,9 @@
      - [Reliance on an external party for safety of transactions and funds](#reliance-on-an-external-party-for-safety-of-transactions-and-funds)
      - [Centralised control of smart contracts and transfer handling scripts](#centralised-control-of-smart-contracts-and-transfer-handling-scripts)
  - [Scope](#scope)
- - [Recommendations](#recommendations)
  - [Issues](#issues)
      - [Minting to opposing chain leads to loss of/stuck funds](#minting-to-opposing-chain-leads-to-loss-ofstuck-funds)
      - [HAL service might cause a double-spend in the Bridge - leads to loss of funds](#hal-service-might-cause-a-double-spend-in-the-bridge---leads-to-loss-of-funds)
- - [Artifacts](#artifacts)
-     - [Surya](#surya)
-     - [Coverage](#coverage)
-     - [Tests](#tests)
  - [License](#license)
 
 
@@ -69,12 +64,11 @@
 
 - **Client** HaloDAO
 - **Date** August 2021
-- **Lead reviewer** Daniel Luca ([@cleanunicorn](https://twitter.com/cleanunicorn))
+- **Lead reviewer** Andrei Simion ([@andreiashu](https://twitter.com/andreiashu))
 - **Reviewers** Daniel Luca ([@cleanunicorn](https://twitter.com/cleanunicorn)), Andrei Simion ([@andreiashu](https://twitter.com/andreiashu))
 - **Repository**: [HaloDAO Bridge Handler](git@github.com:HaloDAO/serverless-bridge-handler.git)
 - **Commit hash** `2c54d69a75fddaabc97eb140509c112ec8575828`
 - **Technologies**
-  - Solidity
   - TypeScript
 
 ## Issues Summary
@@ -104,7 +98,7 @@ While discussing with the team it became clear early on that the HAL service wai
 
 The next question we asked ourselves was what should be a safe amount of block confirmations to consider a block as finalized for each of the chains involved. The Polygon chain has much faster block times and therefore requires a higher number of confirmations. We detailed our findings about this in issue #1.
 
-We continued to review the code, while creating an overview of the architecture to help us have a better understanding of its trust model.
+We continued to review the code and communicate with the team, while creating an overview of the architecture to help us have a better understanding of its trust model.
 
 ## Trust model
 
@@ -112,7 +106,7 @@ We identified a few important parts of the system that hold increased trust and 
 
 ### Reliance on an external party for safety of transactions and funds
 
-In its current form, the HAL service has full control over funds on all chains supported by the HaloDAO Bridge. For example, if HAL is compromised, an attacker __is able to drain funds__ out of the Ethereum mainnet `PrimaryBridge` contract. 
+The HAL service has full control over funds on all chains supported by the HaloDAO Bridge. For example, if HAL is compromised, an attacker __is able to drain funds__ out of the Ethereum mainnet `PrimaryBridge` contract. 
 
 ### Centralised control of smart contracts and transfer handling scripts
 
@@ -125,160 +119,62 @@ The Bridge Handler will have to run on a server (AWS infrastructure), therefore 
 
 The initial review focused on the [HaloDAO Bridge Handler](git@github.com:HaloDAO/serverless-bridge-handler.git) repository, identified by the commit hash `2c54d69a75fddaabc97eb140509c112ec8575828`.
 
-<!-- We focused on manually reviewing the codebase, searching for security issues such as, but not limited to, re-entrancy problems, transaction ordering, block timestamp dependency, exception handling, call stack depth limitation, integer overflow/underflow, self-destructible contracts, unsecured balance, use of origin, costly gas patterns, architectural problems, code readability. -->
-
 **Includes:**
-- GoodContract.sol
 
-**Excludes:**
-- BadContract.sol
+- code/database/migrations/20210709195024_bridge_contracts.ts
+- code/database/migrations/20210713001648_mint_requests.ts
+- code/database/migrations/20210721125855_burns.ts
+- code/database/migrations/20210721130355_redeem_requests.ts
+- code/database/migrations/20210729010706_webhook_triggers.ts
+- code/database/migrations/20210706173702_deposits.ts
+- code/database/knex.ts
+- code/database/seeds/bridge_contracts.ts
+- code/database/seeds/webhook_triggers.ts
+- code/app/middlewares/ListMetadata.ts
+- code/app/utils/FeeCalculator.ts
+- code/app/utils/logger.ts
+- code/app/utils/message.ts
+- code/app/utils/RepositoryQueryUtil.ts
+- code/app/repositories/WebhookTriggerRepository.ts
+- code/app/repositories/MintRequestRepository.ts
+- code/app/repositories/DepositRepository.ts
+- code/app/repositories/BaseRepository.ts
+- code/app/repositories/RedeemRequestRepository.ts
+- code/app/repositories/BurnRepository.ts
+- code/app/repositories/BridgeContractRepository.ts
+- code/app/external-services/SQSService.ts
+- code/app/external-services/SecretsManagerService.ts
+- code/app/container.ts
+- code/app/factories/ParentBridge.ts
+- code/app/factories/SecondaryBridge.ts
+- code/app/factories/PrimaryBridge.ts
+- code/app/factories/ChainProvider.ts
+- code/app/factories/TokenContract.ts
+- code/app/model/dto/MintRequest.ts
+- code/app/model/dto/BridgeContract.ts
+- code/app/model/dto/WebhookTrigger.ts
+- code/app/model/dto/Burn.ts
+- code/app/model/dto/Transaction.ts
+- code/app/model/dto/Deposit.ts
+- code/app/model/dto/RedeemRequest.ts
+- code/app/model/vo/responseVo.ts
+- code/app/model/vo/apiQueryVo.ts
+- code/app/handler.ts
+- code/app/env.ts
+- code/app/handlers/SecondaryBridgeHandler.ts
+- code/app/handlers/DepositHandler.ts
+- code/app/handlers/MintRequestHandler.ts
+- code/app/handlers/BurnHandler.ts
+- code/app/handlers/RedeemRequestHandler.ts
+- code/app/handlers/PrimaryBridgeHandler.ts
+- code/app/services/SecondaryBridgeService.ts
+- code/app/services/BurnService.ts
+- code/app/services/RedeemRequestService.ts
+- code/app/services/MintRequestService.ts
+- code/app/services/DepositService.ts
+- code/app/services/PrimaryBridgeService.ts
+- code/tsconfig.json
 
-## Recommendations
-
-We identified a few possible general improvements that are not security issues during the review, which will bring value to the developers and the community reviewing and using the product.
-
-<!-- ### Increase the number of tests
-
-A good rule of thumb is to have 100% test coverage. This does not guarantee the lack of security problems, but it means that the desired functionality behaves as intended. The negative tests also bring a lot of value because not allowing some actions to happen is also part of the desired behavior.
-
--->
-
-<!-- ### Set up Continuous Integration
-
-Use one of the platforms that offer Continuous Integration services and implement a list of actions that compile, test, run coverage and create alerts when the pipeline fails.
-
-Because the repository is hosted on GitHub, the most painless way to set up the Continuous Integration is through [GitHub Actions](https://docs.github.com/en/free-pro-team@latest/actions).
-
-Setting up the workflow can start based on this example template.
-
-
-```yml
-name: Continuous Integration
-
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-
-jobs:
-  build:
-    name: Build and test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12.x]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: cp ./config.sample.js ./config.js
-    - run: npm test
-
-  coverage:
-    name: Coverage
-    needs: build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [12.x]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: cp ./config.sample.js ./config.js
-    - run: npm run coverage
-    - uses: actions/upload-artifact@v2
-      with:
-        name: Coverage ${{ matrix.node-version }}
-        path: |
-          coverage/
-```
-
-This CI template activates on pushes and pull requests on the **master** branch.
-
-```yml
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-```
-
-It uses an [Ubuntu Docker](https://hub.docker.com/_/ubuntu) image as a base for setting up the project.
-
-```yml
-    runs-on: ubuntu-latest
-```
-
-Multiple Node.js versions can be used to check integration. However, because this is not primarily a Node.js project, multiple versions don't provide added value.
-
-```yml
-    strategy:
-      matrix:
-        node-version: [12.x]
-```
-
-A script item should be added in the `scripts` section of [package.json](./code/package.json) that runs all tests.
-
-```json
-{
-   "script": {
-      "test": "buidler test"
-   }
-}
-```
-
-This can then be called by running `npm test` after setting up the dependencies with `npm ci`.
-
-If any hidden variables need to be defined, you can set them up in a local version of `./config.sample.js` (locally named `./config.js`). If you decide to do that, you should also add `./config.js` in `.gitignore` to make sure no hidden variables are pushed to the public repository. The sample config file `./config.sample.js` should be sufficient to pass the test suite.
-
-```yml
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: cp ./config.sample.js ./config.js
-    - run: npm test
-```
-
-You can also choose to run coverage and upload the generated artifacts.
-
-```yml
-    - run: npm run coverage
-    - uses: actions/upload-artifact@v2
-      with:
-        name: Coverage ${{ matrix.node-version }}
-        path: |
-          coverage/
-```
-
-At the moment, checking the artifacts is not [that](https://github.community/t/browsing-artifacts/16954) [easy](https://github.community/t/need-clarification-on-github-actions/16027/2), because one needs to download the zip archive, unpack it and check it. However, the coverage can be checked in the **Actions** section once it's set up.
-
--->
-
-<!-- ### Contract size
-
-The contracts are dangerously close to the hard limit defined by [EIP-170](https://eips.ethereum.org/EIPS/eip-170), specifically **24676 bytes**.
-
-Depending on the Solidity compiler version and the optimization runs, the contract size might increase over the hard limit. As stated in [the Solidity documentation](https://solidity.readthedocs.io/en/latest/using-the-compiler.html#using-the-commandline-compiler), increasing the number of optimizer runs increases the contract size.
-
-> If you want the initial contract deployment to be cheaper and the later function executions to be more expensive, set it to `--optimize-runs=1`. If you expect many transactions and do not care for higher deployment cost and output size, set `--optimize-runs` to a high number.
-
-Even if you remove the unused internal functions, it will not reduce the contract size because the Solidity compiler shakes that unused code out of the generated bytecode.
-
-#### DELEGATECALL approach
-
-Another way to improve contract size is by breaking them into multiple smaller contracts, grouped by functionality and using `DELEGATECALL` to execute that code. A standard that defines code splitting and selective code upgrade is the [EIP-2535 Diamond Standard](https://eips.ethereum.org/EIPS/eip-2535), which is an extension of [Transparent Contract Standard](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1538.md). A detailed explanation, documentation and implementations can be found in the [EIP-2535](https://eips.ethereum.org/EIPS/eip-2535). However, the current EIP is in **Draft** status, which means the interface, implementation, and overall architecture might change. Another thing to keep in mind is that using this pattern increases the gas cost. -->
 
 ## Issues
 
@@ -336,6 +232,7 @@ The [Matic/Polygon Bridge](https://wallet.matic.network/login) will wait for up 
 ---
 
 
+
 ### [HAL service might cause a double-spend in the Bridge - leads to loss of funds](https://github.com/monoceros-alpha/review-halo-bridge-handler-2021-08/issues/1)
 ![Issue status: Open](https://img.shields.io/static/v1?label=Status&message=Open&color=5856D6&style=flat-square) ![Major](https://img.shields.io/static/v1?label=Severity&message=Major&color=ff3b30&style=flat-square)
 
@@ -376,59 +273,7 @@ Additionally, we recommend having a Service Level Agreement (SLA) with a service
 ---
 
 
-## Artifacts
 
-### Surya
-
-Sūrya is a utility tool for smart contract systems. It provides a number of visual outputs and information about the structure of smart contracts. It also supports querying the function call graph in multiple ways to aid in the manual inspection and control flow analysis of contracts.
-
-<!-- **Contracts Description Table**
-
-```text
-surya mdreport report.md Contract.sol
-```
-
--->
-
-#### Graphs
-
-<!-- ***Contract***
-
-```text
-surya graph Contract.sol | dot -Tpng > ./static/Contract_graph.png
-```
-
-![Contract Graph](./static/Contract_graph.png)
-
-```text
-surya inheritance Contract.sol | dot -Tpng > ./static/Contract_inheritance.png
-```
-
-![Contract Inheritance](./static/Contract_inheritance.png)
-
-```text
-Use Solidity Visual Auditor
-```
-
-![Contract UML](./static/Contract_uml.png) -->
-
-#### Describe
-
-<!-- ```text
-$ npx surya describe ./Contract.sol
-``` -->
-
-### Coverage
-
-<!-- ```text
-$ npm run coverage
-``` -->
-
-### Tests
-
-<!-- ```text
-$ npx buidler test
-``` -->
 
 ## License
 
