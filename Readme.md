@@ -55,8 +55,8 @@
      - [Centralised control of smart contracts and transfer handling scripts](#centralised-control-of-smart-contracts-and-transfer-handling-scripts)
  - [Scope](#scope)
  - [Issues](#issues)
-     - [Minting to opposing chain leads to loss of/stuck funds](#minting-to-opposing-chain-leads-to-loss-ofstuck-funds)
-     - [HAL service might cause a double-spend in the Bridge - leads to loss of funds](#hal-service-might-cause-a-double-spend-in-the-bridge---leads-to-loss-of-funds)
+     - [Minting to opposing chain can lead to loss of funds](#minting-to-opposing-chain-can-lead-to-loss-of-funds)
+     - [HAL service might cause a double-spend in the Bridge - can lead to loss of funds](#hal-service-might-cause-a-double-spend-in-the-bridge---can-lead-to-loss-of-funds)
  - [License](#license)
 
 
@@ -182,7 +182,7 @@ The initial review focused on the [HaloDAO Bridge Handler](git@github.com:HaloDA
 ## Issues
 
 
-### [Minting to opposing chain leads to loss of/stuck funds](https://github.com/monoceros-alpha/review-halo-bridge-handler-2021-08/issues/2)
+### [Minting to opposing chain can lead to loss of funds](https://github.com/monoceros-alpha/review-halo-bridge-handler-2021-08/issues/2)
 ![Issue status: Open](https://img.shields.io/static/v1?label=Status&message=Open&color=5856D6&style=flat-square) ![Major](https://img.shields.io/static/v1?label=Severity&message=Major&color=ff3b30&style=flat-square)
 
 **Description**
@@ -236,7 +236,7 @@ The [Matic/Polygon Bridge](https://wallet.matic.network/login) will wait for up 
 
 
 
-### [HAL service might cause a double-spend in the Bridge - leads to loss of funds](https://github.com/monoceros-alpha/review-halo-bridge-handler-2021-08/issues/1)
+### [HAL service might cause a double-spend in the Bridge - can lead to loss of funds](https://github.com/monoceros-alpha/review-halo-bridge-handler-2021-08/issues/1)
 ![Issue status: Open](https://img.shields.io/static/v1?label=Status&message=Open&color=5856D6&style=flat-square) ![Major](https://img.shields.io/static/v1?label=Severity&message=Major&color=ff3b30&style=flat-square)
 
 **Description**
