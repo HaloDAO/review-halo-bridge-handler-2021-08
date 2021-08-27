@@ -35,6 +35,15 @@
                     "name": "Major",
                     "node_id": "MDU6TGFiZWwzMjY4NDczMDUy",
                     "url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08/labels/Major"
+                },
+                {
+                    "color": "007AFF",
+                    "default": false,
+                    "description": null,
+                    "id": 3268473089,
+                    "name": "Acknowledged",
+                    "node_id": "MDU6TGFiZWwzMjY4NDczMDg5",
+                    "url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08/labels/Acknowledged"
                 }
             ],
             "labels_url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08/issues/2/labels{/name}",
@@ -46,7 +55,7 @@
             "repository_url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08",
             "state": "open",
             "title": "Minting to opposing chain can lead to loss of funds",
-            "updated_at": "2021-08-26T08:14:16Z",
+            "updated_at": "2021-08-27T10:54:13Z",
             "url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08/issues/2",
             "user": {
                 "avatar_url": "https://avatars.githubusercontent.com/u/342638?v=4",
@@ -100,6 +109,15 @@
                     "name": "Major",
                     "node_id": "MDU6TGFiZWwzMjY4NDczMDUy",
                     "url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08/labels/Major"
+                },
+                {
+                    "color": "007AFF",
+                    "default": false,
+                    "description": null,
+                    "id": 3268473089,
+                    "name": "Acknowledged",
+                    "node_id": "MDU6TGFiZWwzMjY4NDczMDg5",
+                    "url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08/labels/Acknowledged"
                 }
             ],
             "labels_url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08/issues/1/labels{/name}",
@@ -111,7 +129,7 @@
             "repository_url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08",
             "state": "open",
             "title": "HAL service might cause a double-spend in the Bridge - can lead to loss of funds",
-            "updated_at": "2021-08-26T08:14:40Z",
+            "updated_at": "2021-08-27T10:54:18Z",
             "url": "https://api.github.com/repos/monoceros-alpha/review-halo-bridge-handler-2021-08/issues/1",
             "user": {
                 "avatar_url": "https://avatars.githubusercontent.com/u/342638?v=4",
