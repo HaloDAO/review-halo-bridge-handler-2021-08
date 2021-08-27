@@ -38,9 +38,9 @@ We started by going through the Solidity smart contracts inside the HaloDAO Toke
 
 Because of the nature of decentralized blockchains, it is critical that the code that interacts with any of the chains involved in the transfer process are aware of [_chain reorganization_ (or _reorg_)](https://learnmeabitcoin.com/technical/chain-reorganisation).
 
-While discussing with the team, it became clear that the HAL service waits for three block confirmations before it considers a block as finalized. This is nowhere near the desired safety level for a cross-chain Bridge. For example, centralized exchanges use a minimum of 10 confirmations for any Ethereum / ERC20 transfer (we provide more details in #1).
+While discussing with the team, it became clear that the HAL service waits for three block confirmations before it considers a block as finalized. This is nowhere near the desired safety level for a cross-chain Bridge. For example, centralized exchanges use a minimum of 10 confirmations for any Ethereum / ERC20 transfer (we provide more details in [#1](#hal-service-might-cause-a-double-spend-in-the-bridge---can-lead-to-loss-of-funds)).
 
-The next question we asked ourselves was what should be a safe amount of block confirmations to consider a block as finalized for each of the chains involved. The Polygon chain has much faster block times and therefore requires a higher number of confirmations. We detailed our findings in issue #2.
+The next question we asked ourselves was what should be a safe amount of block confirmations to consider a block as finalized for each of the chains involved. The Polygon chain has much faster block times and therefore requires a higher number of confirmations. We detailed our findings in issue [#2](#minting-to-opposing-chain-can-lead-to-loss-of-funds).
 
 We continued to review the code and communicate with the team while creating an overview of the architecture to help us better understand its trust model.
 
@@ -65,60 +65,11 @@ The initial review focused on the [{{project_name}}]({{source_repository}}) repo
 
 **Includes:**
 
-- code/database/migrations/20210709195024_bridge_contracts.ts
-- code/database/migrations/20210713001648_mint_requests.ts
-- code/database/migrations/20210721125855_burns.ts
-- code/database/migrations/20210721130355_redeem_requests.ts
-- code/database/migrations/20210729010706_webhook_triggers.ts
-- code/database/migrations/20210706173702_deposits.ts
-- code/database/knex.ts
-- code/database/seeds/bridge_contracts.ts
-- code/database/seeds/webhook_triggers.ts
-- code/app/middlewares/ListMetadata.ts
-- code/app/utils/FeeCalculator.ts
-- code/app/utils/logger.ts
-- code/app/utils/message.ts
-- code/app/utils/RepositoryQueryUtil.ts
-- code/app/repositories/WebhookTriggerRepository.ts
-- code/app/repositories/MintRequestRepository.ts
-- code/app/repositories/DepositRepository.ts
-- code/app/repositories/BaseRepository.ts
-- code/app/repositories/RedeemRequestRepository.ts
-- code/app/repositories/BurnRepository.ts
-- code/app/repositories/BridgeContractRepository.ts
-- code/app/external-services/SQSService.ts
-- code/app/external-services/SecretsManagerService.ts
-- code/app/container.ts
+
 - code/app/factories/ParentBridge.ts
 - code/app/factories/SecondaryBridge.ts
 - code/app/factories/PrimaryBridge.ts
 - code/app/factories/ChainProvider.ts
-- code/app/factories/TokenContract.ts
-- code/app/model/dto/MintRequest.ts
-- code/app/model/dto/BridgeContract.ts
-- code/app/model/dto/WebhookTrigger.ts
-- code/app/model/dto/Burn.ts
-- code/app/model/dto/Transaction.ts
-- code/app/model/dto/Deposit.ts
-- code/app/model/dto/RedeemRequest.ts
-- code/app/model/vo/responseVo.ts
-- code/app/model/vo/apiQueryVo.ts
-- code/app/handler.ts
-- code/app/env.ts
-- code/app/handlers/SecondaryBridgeHandler.ts
-- code/app/handlers/DepositHandler.ts
-- code/app/handlers/MintRequestHandler.ts
-- code/app/handlers/BurnHandler.ts
-- code/app/handlers/RedeemRequestHandler.ts
-- code/app/handlers/PrimaryBridgeHandler.ts
-- code/app/services/SecondaryBridgeService.ts
-- code/app/services/BurnService.ts
-- code/app/services/RedeemRequestService.ts
-- code/app/services/MintRequestService.ts
-- code/app/services/DepositService.ts
-- code/app/services/PrimaryBridgeService.ts
-- code/tsconfig.json
-
 
 ## Issues
 
