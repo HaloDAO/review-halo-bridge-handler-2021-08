@@ -97,9 +97,9 @@ We started by going through the Solidity smart contracts inside the HaloDAO Toke
 
 Because of the nature of decentralized blockchains, it is critical that the code that interacts with any of the chains involved in the transfer process are aware of [_chain reorganization_ (or _reorg_)](https://learnmeabitcoin.com/technical/chain-reorganisation).
 
-While discussing with the team, it became clear that the HAL service waits for three block confirmations before it considers a block as finalized. This is nowhere near the desired safety level for a cross-chain Bridge. For example, centralized exchanges use a minimum of 10 confirmations for any Ethereum / ERC20 transfer (we detailed this in issue #1).
+While discussing with the team, it became clear that the HAL service waits for three block confirmations before it considers a block as finalized. This is nowhere near the desired safety level for a cross-chain Bridge. For example, centralized exchanges use a minimum of 10 confirmations for any Ethereum / ERC20 transfer (we provide more details in #1).
 
-The next question we asked ourselves was what should be a safe amount of block confirmations to consider a block as finalized for each of the chains involved. The Polygon chain has much faster block times and therefore requires a higher number of confirmations. We detailed our findings of this in issue #1.
+The next question we asked ourselves was what should be a safe amount of block confirmations to consider a block as finalized for each of the chains involved. The Polygon chain has much faster block times and therefore requires a higher number of confirmations. We detailed our findings in issue #2.
 
 We continued to review the code and communicate with the team while creating an overview of the architecture to help us better understand its trust model.
 
